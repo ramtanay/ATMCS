@@ -140,21 +140,19 @@ app.post('/chat', (req, res) => {
 
 // User routes
 
-// Signup page route
+// Signup GET route (renders the signup form)
 app.get('/signup', (req, res) => {
-    res.render("signup");
+    res.render('signup');  // Ensure you have 'signup.hbs' in the 'views' folder
 });
 
-// Signup post request
+// Signup POST route (handles the form submission)
 app.post('/signup', async (req, res) => {
     try {
-        // Check if email already exists
         const existingUser = await User.findOne({ email: req.body.email });
         if (existingUser) {
             return res.send('Email already in use.');
         }
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const newUser = new User({
             role: req.body.role,
@@ -162,21 +160,23 @@ app.post('/signup', async (req, res) => {
             email: req.body.email,
             password: hashedPassword,
             gender: req.body.gender,
-            phone: req.body.phone
+            phone: req.body.phone,
+            dob: req.body.dob, // Add DOB handling
+            insurance: req.body.insurance || null,
+            medicalHistory: req.body.medicalHistory || null,
+            license: req.body.license || null,
+            specialty: req.body.specialty || null,
+            hospital: req.body.hospital || null,
+            adminCode: req.body.adminCode || null
         });
 
-        // Save user and start session
         await newUser.save();
-        req.session.user = {
-            id: newUser._id,
-            email: newUser.email,
-            role: newUser.role
-        };
-        res.render('dashboard', { user: req.session.user });
+        res.redirect('/dashboard'); // Redirect to dashboard after signup
     } catch (error) {
-        res.send('Error: ' + error.message);
+        res.status(500).send('Error: ' + error.message);
     }
 });
+
 
 // Login page route
 app.get('/login', (req, res) => {
