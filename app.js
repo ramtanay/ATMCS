@@ -1,10 +1,10 @@
-const express = require('express');
+const express = require('express'); 
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const path = require('path');
-const session = require('express-session'); // Import express-session
+const session = require('express-session');
 
 const app = express();
 const PORT = 5000; // Set the port number
@@ -37,14 +37,21 @@ app.use(express.urlencoded({ extended: true }));
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/medDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
-// User schema definition
+// Updated User schema definition
 const userSchema = new mongoose.Schema({
-    role: String,
-    name: String,
-    email: String,
-    password: String,
-    gender: String,
-    phone: String,
+    role: { type: String, required: true },
+    name: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
+    password: { type: String, required: true },
+    gender: { type: String, required: true },
+    phone: { type: String, required: true },
+    dob: { type: Date, required: true }, // Date of Birth
+    insurance: { type: String }, // Optional: Health insurance details
+    medicalHistory: { type: String }, // Optional: Medical history details
+    license: { type: String }, // Optional: For doctors, professional license number
+    specialty: { type: String }, // Optional: For doctors, medical specialty
+    hospital: { type: String }, // Optional: Hospital/clinic where the doctor works
+    adminCode: { type: String }, // Optional: Special code for admin users
 });
 
 // Create User model
@@ -100,8 +107,8 @@ const getRandomHealthTip = () => {
 
 // Chatbot route
 app.get('/chat',(req,res)=>{
-    res.render('chat')
-})
+    res.render('chat');
+});
 app.post('/chat', (req, res) => {
     const userMessage = req.body.message.toLowerCase();
 
@@ -183,7 +190,7 @@ app.get('/login', (req, res) => {
     res.render("login");
 });
 
-// Login post request
+// Login POST route (handles login form submission)
 app.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ email: req.body.email });
@@ -222,7 +229,7 @@ app.get('/logout', (req, res) => {
         if (err) {
             return res.send('Failed to logout.');
         }
-        res.redirect('/login');
+        res.render('index');
     });
 });
 
@@ -231,7 +238,15 @@ app.get('/', (req, res) => {
     res.render('index');
 });
 app.get('/index', (req, res) => {
-    res.render('index');
+    if (req.session.user) {
+        res.render('aindex');
+
+    }
+    else{
+        res.render('index');
+    }
+
+
 });
 app.get('/aindex', (req, res) => {
     if (!req.session.user) {
@@ -323,7 +338,7 @@ app.get('/404', (req, res) => {
     res.render("404");
 });
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
