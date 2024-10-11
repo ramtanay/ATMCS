@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signup - Medical Portal</title>
-    <link rel="stylesheet" href="./css/role-sign-up.css">
+    <link rel="stylesheet" href="/css/role-sign-up.css">
 </head>
 <body>
     <div class="container">
         <div class="form-container">
             <div class="logo">
-                <img src="./images/logo.png" alt="Medical Logo">
+                <img src="/images/logo.png" alt="Medical Logo">
             </div>
             <!-- Signup Form -->
             <div class="form signup-form">
@@ -42,15 +42,15 @@
 
                     <!-- Patient-Specific Fields -->
                     <div id="patient-fields" class="role-specific-fields" style="display:none;">
-                        <input type="text" id="signup-insurance" name="insurance" placeholder="Insurance Provider">
+                        <input type="text" id="signup-insurance" name="insurance" placeholder="Insurance Provider" required>
                         <textarea id="signup-medical-history" name="medicalHistory" rows="4" placeholder="Medical History (Optional)"></textarea>
                     </div>
 
                     <!-- Doctor-Specific Fields -->
                     <div id="doctor-fields" class="role-specific-fields" style="display:none;">
-                        <input type="text" id="signup-license" name="license" placeholder="Medical License Number">
-                        <input type="text" id="signup-specialty" name="specialty" placeholder="Specialty">
-                        <input type="text" id="signup-hospital" name="hospital" placeholder="Affiliated Hospital/Clinic">
+                        <input type="text" id="signup-license" name="license" placeholder="Medical License Number" required>
+                        <input type="text" id="signup-specialty" name="specialty" placeholder="Specialty" required>
+                        <input type="text" id="signup-hospital" name="hospital" placeholder="Affiliated Hospital/Clinic" required>
                     </div>
 
                     <!-- Admin-Specific Fields -->
@@ -66,27 +66,39 @@
     </div>
 
     <script>
-        document.getElementById('signup-role').addEventListener('change', function() {
-            const role = this.value;
-            const patientFields = document.getElementById('patient-fields');
-            const doctorFields = document.getElementById('doctor-fields');
-            const adminFields = document.getElementById('admin-fields');
+document.getElementById('signup-role').addEventListener('change', function() {
+    const role = this.value;
+    
+    // Get all role-specific fields
+    const patientFields = document.getElementById('patient-fields');
+    const doctorFields = document.getElementById('doctor-fields');
+    const adminFields = document.getElementById('admin-fields');
+    
+    // Reset all required attributes for role-specific fields
+    document.querySelectorAll('.role-specific-fields input').forEach(field => {
+        field.removeAttribute('required');
+    });
 
-            // Hide all role-specific fields by default
-            patientFields.style.display = 'none';
-            doctorFields.style.display = 'none';
-            adminFields.style.display = 'none';
+    // Hide all role-specific fields by default
+    patientFields.style.display = 'none';
+    doctorFields.style.display = 'none';
+    adminFields.style.display = 'none';
 
-            // Show relevant fields based on role selected
-            if (role === 'patient') {
-                patientFields.style.display = 'block';
-            } else if (role === 'doctor') {
-                doctorFields.style.display = 'block';
-            } else if (role === 'admin') {
-                adminFields.style.display = 'block';
-            }
-        });
-    </script>
+    // Show relevant fields based on role selected and set 'required' for specific fields
+    if (role === 'patient') {
+        patientFields.style.display = 'block';
+        document.getElementById('signup-insurance').setAttribute('required', 'required');
+    } else if (role === 'doctor') {
+        doctorFields.style.display = 'block';
+        document.getElementById('signup-license').setAttribute('required', 'required');
+        document.getElementById('signup-specialty').setAttribute('required', 'required');
+        document.getElementById('signup-hospital').setAttribute('required', 'required');
+    } else if (role === 'admin') {
+        adminFields.style.display = 'block';
+        document.getElementById('signup-admin-code').setAttribute('required', 'required');
+    }
+});
+</script>
 
 </body>
 </html>
